@@ -7,6 +7,7 @@
 #include "ESPAsyncWebServer.h"
 #include "AsyncTCP.h"
 #include <PubSubClient.h>
+#include <Update.h>
 
 // --- Strukturen und Enums ---
 enum FormType { STRING, FLOAT, BOOL, LONG };
