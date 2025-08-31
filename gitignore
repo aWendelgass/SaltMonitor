@@ -1,0 +1,51 @@
+
+# Arduino build files
+*.hex
+*.elf
+*.bin
+*.eep
+*.map
+*.d
+*.o
+*.a
+*.lst
+
+# Arduino IDE specific
+*.ino.cpp
+*.ino.*
+*.sdf
+*.suo
+*.opensdf
+*.VC.db
+*.VC.opendb
+
+# PlatformIO
+.pio/
+.vscode/
+
+# Library manager cache
+__MACOSX/
+.DS_Store
+*.swp
+*.tmp
+*.bak
+
+# Build folders
+build/
+Build/
+output/
+out/
+
+# Logs
+*.log
+
+# Compiled Python files (if any)
+*.pyc
+__pycache__/
+
+# ESP-IDF specific
+sdkconfig.old
+sdkconfig
+*.project
+*.cproject
+*.settings/
