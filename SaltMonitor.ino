@@ -89,7 +89,7 @@ const WebStruc webForm[ANZ_WEBFORM_ITEMS] = {
   { PARAMETER,   "Initialer Salz-Füllstand",  key_fuellstand            }
 };
 
-WifiConfigManager configManager(&config, extraParams, webForm, ANZ_WEBFORM_ITEMS, ANZ_EXTRA_PARAMS);
+WifiConfigManager configManager(&config, extraParams, webForm, ANZ_WEBFORM_ITEMS, ANZ_EXTRA_PARAMS, VERSION);
 
 // ------------------------------
 // Waage & Taster

@@ -9,9 +9,11 @@ WifiConfigManager::WifiConfigManager(ConfigStruc* config,
                                      ExtraStruc* extraParams,
                                      const WebStruc* webForm,
                                      int webFormCount,
-                                     int anzExtraparams)
+                                     int anzExtraparams,
+                                     const char* firmwareVersion)
 : _server(80), _mqttClient(_wifiClient), _config(config), _extraParams(extraParams),
-  _webForm(webForm), _webFormCount(webFormCount), _anzExtraparams(anzExtraparams) {}
+  _webForm(webForm), _webFormCount(webFormCount), _anzExtraparams(anzExtraparams),
+  _firmwareVersion(firmwareVersion) {}
 
 WifiConfigManager::~WifiConfigManager() {}
 
@@ -375,6 +377,9 @@ String WifiConfigManager::_getHtmlForm() {
 
   // OTA Update Form
   html += "<div class='config-block'><h2>Firmware Update (OTA)</h2>";
+  if (_firmwareVersion) {
+    html += "<p style='text-align:center;'>Aktuelle Version: <strong>" + String(_firmwareVersion) + "</strong></p>";
+  }
   html += "<form method='POST' action='/update' enctype='multipart/form-data' id='upload_form'>";
   html += "<div class='form-row'><label for='update'>Firmware (.bin):</label><input type='file' id='update' name='update' accept='.bin' required></div>";
   html += "<div class='button-container'><button type='submit' class='button-update'>Update starten</button></div>";
