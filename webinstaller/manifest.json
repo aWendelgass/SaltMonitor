@@ -1,0 +1,15 @@
+{
+  "name": "Water-Softener-Salt-Monitor",
+  "version": "1.0.0",
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        {
+          "path": "SaltMonitor.ino.bin",
+          "offset": 4096
+        }
+      ]
+    }
+  ]
+}
