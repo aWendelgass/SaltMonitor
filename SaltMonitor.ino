@@ -170,7 +170,12 @@ static void drawTwoLine(const char* l1, const char* l2){ if(!oledAvailable) retu
 static void drawLive(){ if(!oledAvailable) return; display.clearDisplay();
   u8g2.setFont(u8g2_font_6x13_tf); u8g2.setCursor(0,12); u8g2.print(meineWaage.istKalibriert()?F("Waage OK"):F("NICHT KAL."));
   drawWeightValue(meineWaage.getGewichtKg(), 0, 36);
-  u8g2.setFont(u8g2_font_6x13_tf); u8g2.setCursor(0,62); u8g2.print(F("(kurz: Menü)"));
+  if (configManager.isWifiConnected()) {
+    String rssiStr = "RSSI: " + String(configManager.getRSSI()) + " dBm";
+    u8g2.setFont(u8g2_font_6x13_tf); u8g2.setCursor(0,62); u8g2.print(rssiStr);
+  } else {
+    u8g2.setFont(u8g2_font_6x13_tf); u8g2.setCursor(0,62); u8g2.print(F("WiFi nicht verbunden"));
+  }
   display.display();
 }
 
