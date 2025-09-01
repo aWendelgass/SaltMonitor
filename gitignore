@@ -51,6 +51,7 @@ sdkconfig
 *.settings/
 
 #Local Version Backup
+archiv/
 Archiv/
 *.bat
 *.ps1
