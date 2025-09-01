@@ -1,4 +1,4 @@
-constexpr const char* VERSION = "Version 2.2";
+constexpr const char* VERSION = "Version 2.3e";
 
 // EntkalkerMonitor.ino — Version 1.2  27.08.2025
 
@@ -66,7 +66,7 @@ ConfigStruc config = {
 
 ExtraStruc extraParams[ANZ_EXTRA_PARAMS] = {
   { key_Kalibirierungsgewicht , FLOAT, "", 5.000, false, -1, false, true  }, // 5.000 kg Default
-  { key_Kalibirierungfaktor,    FLOAT, "", 11.1,  false, -1, false, false },
+  { key_Kalibirierungfaktor,    FLOAT, "", 11.1,  false, -1, false, true },
   { key_offset,                  LONG,  "", -1.0,  false,  0, false, false },
   { key_kalibriert,              BOOL,  "", -1.0,  false, -1, false, false },
   { key_akkusticalarm,           BOOL,  "", -1.0,  true,  -1, false, true  },
@@ -170,12 +170,7 @@ static void drawTwoLine(const char* l1, const char* l2){ if(!oledAvailable) retu
 static void drawLive(){ if(!oledAvailable) return; display.clearDisplay();
   u8g2.setFont(u8g2_font_6x13_tf); u8g2.setCursor(0,12); u8g2.print(meineWaage.istKalibriert()?F("Waage OK"):F("NICHT KAL."));
   drawWeightValue(meineWaage.getGewichtKg(), 0, 36);
-  if (configManager.isWifiConnected()) {
-    String rssiStr = "RSSI: " + String(configManager.getRSSI()) + " dBm";
-    u8g2.setFont(u8g2_font_6x13_tf); u8g2.setCursor(0,62); u8g2.print(rssiStr);
-  } else {
-    u8g2.setFont(u8g2_font_6x13_tf); u8g2.setCursor(0,62); u8g2.print(F("WiFi nicht verbunden"));
-  }
+  u8g2.setFont(u8g2_font_6x13_tf); u8g2.setCursor(0,62); u8g2.print(F("(kurz: Menü)"));
   display.display();
 }
 
@@ -247,10 +242,6 @@ static void mqttPublishLoop(){
   // calibrated
   String tCal = base + F("/calibrated");
   configManager.publish(tCal.c_str(), meineWaage.istKalibriert()?"1":"0", true, 0);
-
-  // rssi
-  String tRssi = base + F("/rssi");
-  configManager.publish(tRssi.c_str(), String(configManager.getRSSI()), true, 0);
 }
 
 // ------------------------------

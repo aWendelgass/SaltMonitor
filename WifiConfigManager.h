@@ -7,6 +7,7 @@
 #include "ESPAsyncWebServer.h"
 #include "AsyncTCP.h"
 #include <PubSubClient.h>
+#include <Update.h>
 
 // --- Strukturen und Enums ---
 enum FormType { STRING, FLOAT, BOOL, LONG };
@@ -47,7 +48,8 @@ public:
                     ExtraStruc* extraParams,
                     const WebStruc* webForm,
                     int webFormCount,
-                    int anzExtraparams);
+                    int anzExtraparams,
+                    const char* firmwareVersion);
   ~WifiConfigManager();
 
   // Lebenszyklus
@@ -91,6 +93,7 @@ private:
   // Basiskonfig
   String _apNamePrefix;
   int    _anzExtraparams;
+  const char* _firmwareVersion;
 
   // Referenzen
   ConfigStruc*    _config;

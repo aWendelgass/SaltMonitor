@@ -9,9 +9,11 @@ WifiConfigManager::WifiConfigManager(ConfigStruc* config,
                                      ExtraStruc* extraParams,
                                      const WebStruc* webForm,
                                      int webFormCount,
-                                     int anzExtraparams)
+                                     int anzExtraparams,
+                                     const char* firmwareVersion)
 : _server(80), _mqttClient(_wifiClient), _config(config), _extraParams(extraParams),
-  _webForm(webForm), _webFormCount(webFormCount), _anzExtraparams(anzExtraparams) {}
+  _webForm(webForm), _webFormCount(webFormCount), _anzExtraparams(anzExtraparams),
+  _firmwareVersion(firmwareVersion) {}
 
 WifiConfigManager::~WifiConfigManager() {}
 
@@ -167,6 +169,38 @@ void WifiConfigManager::_startAP() {
       }
     }
   );
+
+  // OTA Update Handler
+  _server.on("/update", HTTP_POST, [](AsyncWebServerRequest *request){
+    bool shouldReboot = !Update.hasError();
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", shouldReboot ? "OK" : "FAIL");
+    response->addHeader("Connection", "close");
+    request->send(response);
+    if (shouldReboot) {
+      delay(1000);
+      ESP.restart();
+    }
+  }, [](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
+    if (index == 0) {
+      Serial.printf("Update Start: %s\n", filename.c_str());
+      if (!Update.begin(UPDATE_SIZE_UNKNOWN)) {
+        Update.printError(Serial);
+      }
+    }
+    if (!Update.hasError()) {
+      if (Update.write(data, len) != len) {
+        Update.printError(Serial);
+      }
+    }
+    if (final) {
+      if (Update.end(true)) {
+        Serial.printf("Update Success: %uB\n", index + len);
+      } else {
+        Update.printError(Serial);
+      }
+    }
+  });
+
   _server.begin();
   Serial.println("AP-Modus gestartet.");
 }
@@ -199,6 +233,37 @@ void WifiConfigManager::_connectToWiFi() {
         }
       }
     );
+
+    // OTA Update Handler
+    _server.on("/update", HTTP_POST, [](AsyncWebServerRequest *request){
+      bool shouldReboot = !Update.hasError();
+      AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", shouldReboot ? "OK" : "FAIL");
+      response->addHeader("Connection", "close");
+      request->send(response);
+      if (shouldReboot) {
+        delay(1000);
+        ESP.restart();
+      }
+    }, [](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
+      if (index == 0) {
+        Serial.printf("Update Start: %s\n", filename.c_str());
+        if (!Update.begin(UPDATE_SIZE_UNKNOWN)) {
+          Update.printError(Serial);
+        }
+      }
+      if (!Update.hasError()) {
+        if (Update.write(data, len) != len) {
+          Update.printError(Serial);
+        }
+      }
+      if (final) {
+        if (Update.end(true)) {
+          Serial.printf("Update Success: %uB\n", index + len);
+        } else {
+          Update.printError(Serial);
+        }
+      }
+    });
 
     _server.begin();
   } else {
@@ -309,7 +374,44 @@ String WifiConfigManager::_getHtmlForm() {
   html += "<div class='form-row'><label></label><div class='checkbox-container'><input type='checkbox' id='reset_config' name='reset_config'><label for='reset_config'>Alle Konfigurationsdaten löschen (Werkseinstellung!)</label></div></div>";
   html += "<div class='button-container'><button type='submit'>Daten übernehmen</button></div>";
   html += "</form>";
+
+  // OTA Update Form
+  html += "<div class='config-block'><h2>Firmware Update (OTA)</h2>";
+  if (_firmwareVersion) {
+    html += "<p style='text-align:center;'>Aktuelle Version: <strong>" + String(_firmwareVersion) + "</strong></p>";
+  }
+  html += "<form method='POST' action='/update' enctype='multipart/form-data' id='upload_form'>";
+  html += "<div class='form-row'><label for='update'>Firmware (.bin):</label><input type='file' id='update' name='update' accept='.bin' required></div>";
+  html += "<div class='button-container'><button type='submit' class='button-update'>Update starten</button></div>";
+  html += "</form>";
+  html += "<div id='prg_container' style='display:none;'><p><strong>Update läuft... Bitte warten.</strong></p><progress id='prg' value='0' max='100'></progress></div>";
+  html += "</div>";
+
   html += "<script>function togglePass(passId,cb){var p=document.getElementById(passId);var c=document.getElementById(cb);p.type=c.checked?'text':'password';}document.getElementById('show-ssidpasswd').addEventListener('change',function(){togglePass('ssidpasswd','show-ssidpasswd')});var m=document.getElementById('show-mqttPasswd');if(m){m.addEventListener('change',function(){togglePass('mqttPasswd','show-mqttPasswd')});}</script>";
+  
+  // Script for OTA progress
+  html += "<script>";
+  html += "var upload_form=document.getElementById('upload_form');";
+  html += "var prg_container=document.getElementById('prg_container');";
+  html += "var prg=document.getElementById('prg');";
+  html += "upload_form.addEventListener('submit', function(e){";
+  html += "  e.preventDefault();";
+  html += "  prg_container.style.display='block';";
+  html += "  var formData = new FormData(this);";
+  html += "  var xhr = new XMLHttpRequest();";
+  html += "  xhr.open('POST', '/update', true);";
+  html += "  xhr.upload.addEventListener('progress', function(e){";
+  html += "    if (e.lengthComputable) { prg.value = (e.loaded / e.total) * 100; }";
+  html += "  });";
+  html += "  xhr.onload = function(e) { alert('Update erfolgreich! Gerät wird neu gestartet.'); window.location.href = '/'; };";
+  html += "  xhr.onerror = function(e) { alert('Update fehlgeschlagen!'); };";
+  html += "  xhr.send(formData);";
+  html += "});";
+  html += "</script>";
+
+  // Add style for the update button
+  html += "<style>.button-update{background-color:#3498db;}</style>";
+
   html += "</body></html>";
   return html;
 }
