@@ -1,0 +1,15 @@
+{
+  "name": "SaltMonitor",
+  "version": "2.3.2",
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        {
+          "path": "https://github.com/aWendelgass/SaltMonitor/releases/download/2.3.2/firmware.bin",
+          "offset": 65536
+        }
+      ]
+    }
+  ]
+}
