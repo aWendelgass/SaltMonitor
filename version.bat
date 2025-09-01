@@ -1,0 +1,1 @@
+powershell -NoProfile -ExecutionPolicy Bypass -File "Build-SaltMonitorZip.ps1"

@@ -49,3 +49,8 @@ sdkconfig
 *.project
 *.cproject
 *.settings/
+
+#Local Version Backup
+Archiv/
+*.bat
+*.ps1

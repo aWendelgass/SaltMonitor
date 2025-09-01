@@ -207,9 +207,41 @@ void WifiConfigManager::_startAP() {
 
 void WifiConfigManager::_connectToWiFi() {
   WiFi.mode(WIFI_STA);
-  WiFi.begin(_config->ssid, _config->ssidpasswd);
+  
+  Serial.println("Scanning for WiFi networks...");
+  int n = WiFi.scanNetworks();
+  Serial.printf("Scan done, %d networks found.\n", n);
+
+  int bestNetwork = -1;
+  long bestRssi = -1000;
+
+  if (n > 0) {
+    for (int i = 0; i < n; ++i) {
+      if (WiFi.SSID(i) == _config->ssid) {
+        Serial.printf("Found matching network: %s (RSSI: %d dBm)\n", WiFi.SSID(i).c_str(), WiFi.RSSI(i));
+        if (WiFi.RSSI(i) > bestRssi) {
+          bestRssi = WiFi.RSSI(i);
+          bestNetwork = i;
+        }
+      }
+    }
+  }
+
+  if (bestNetwork != -1) {
+    Serial.printf("Connecting to the strongest network: %s (BSSID: %s, Channel: %d, RSSI: %ld dBm)\n",
+                  WiFi.SSID(bestNetwork).c_str(),
+                  WiFi.BSSIDstr(bestNetwork).c_str(),
+                  WiFi.channel(bestNetwork),
+                  bestRssi);
+    WiFi.begin(_config->ssid, _config->ssidpasswd, WiFi.channel(bestNetwork), WiFi.BSSID(bestNetwork));
+  } else {
+    Serial.printf("No network with SSID '%s' found in scan. Trying to connect anyway...\n", _config->ssid);
+    WiFi.begin(_config->ssid, _config->ssidpasswd);
+  }
+
   int retries = 0;
   while (WiFi.status() != WL_CONNECTED && retries < 40) { delay(500); Serial.print("."); retries++; }
+  
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println("\nVerbindung erfolgreich!");
     _setupMDNS();

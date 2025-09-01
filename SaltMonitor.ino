@@ -1,8 +1,8 @@
-constexpr const char* VERSION = "Version 2.32";
+constexpr const char* VERSION = "Version 2.40";
 
-// EntkalkerMonitor.ino — Version 2.32  01.09.2025
+//Geändert in 2.40: WifiConfigManager.CPP: Such nach bestem WLAN Hotspot
 
-// EntkalkerMonitor.ino — U8g2_for_Adafruit_GFX, monospaced Ziffern
+// SaltMonitor.ino — U8g2_for_Adafruit_GFX, monospaced Ziffern
 // Kalibrierung in kg (ohne Heuristik), INFO: IP + MQTT-Status
 // MQTT: gewicht_kg (retained) mit Punkt als Dezimaltrenner
 // Anzeige: weiterhin Komma als Dezimaltrenner
@@ -290,7 +290,7 @@ static void handleLedStatus() {
 void setup(){
   Serial.begin(115200); delay(300);
 Serial.print(VERSION);
-  pinMode(BUTTON_PIN, INPUT_PULLUP); pinMode(LED_PIN, OUTPUT); digitalWrite(LED_PIN, LOW);
+  pinMode(BUTTON_PIN, INPUT_PULLUP); pinMode(LED_PIN, OUTPUT); digitalWrite(LED_PIN, HIGH); // Turn LED ON at boot
 
   // Manager starten; lädt auch gespeicherte Konfig
   configManager.begin("SmartScale");
@@ -324,6 +324,7 @@ void loop(){
   configManager.handleLoop();
   meineWaage.loop();
   mqttPublishLoop();
+  handleLedStatus();
 
   static unsigned long lastOled=0; unsigned long now=millis();
   if(now-lastOled>=500){ updateOLED(); lastOled=now; }
