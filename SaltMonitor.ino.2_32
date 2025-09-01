@@ -1,6 +1,6 @@
-constexpr const char* VERSION = "Version 2.21";
+constexpr const char* VERSION = "Version 2.32";
 
-// SaltMonitor.ino — Version 2.21  01.09.2025
+// EntkalkerMonitor.ino — Version 2.32  01.09.2025
 
 // EntkalkerMonitor.ino — U8g2_for_Adafruit_GFX, monospaced Ziffern
 // Kalibrierung in kg (ohne Heuristik), INFO: IP + MQTT-Status
@@ -247,7 +247,42 @@ static void mqttPublishLoop(){
   // calibrated
   String tCal = base + F("/calibrated");
   configManager.publish(tCal.c_str(), meineWaage.istKalibriert()?"1":"0", true, 0);
+
+  // rssi
+  String tRssi = base + F("/rssi");
+  configManager.publish(tRssi.c_str(), String(configManager.getRSSI()), true, 0);
 }
+
+// ------------------------------
+// Status LED
+// ------------------------------
+static void handleLedStatus() {
+  static unsigned long previousMillis = 0;
+  static bool ledState = LOW;
+  const long interval = 500; // Blink interval 500ms -> 1Hz
+
+  // Do not interfere with calibration blinking, which is a blocking process
+  if (uiPage == UiPage::CALIBRATION) {
+    // The Waage class handles its own blinking with delay()
+    return;
+  }
+
+  if (configManager.isWifiConnected()) {
+    if (ledState == LOW) {
+      digitalWrite(LED_PIN, HIGH);
+      ledState = HIGH;
+    }
+  } else {
+    // Blink LED if not connected
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= interval) {
+      previousMillis = currentMillis;
+      ledState = !ledState;
+      digitalWrite(LED_PIN, ledState);
+    }
+  }
+}
+
 
 // ------------------------------
 // Setup & Loop
