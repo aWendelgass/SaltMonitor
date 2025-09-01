@@ -2,16 +2,43 @@
 <html lang="de">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SaltMonitor Web Flash</title>
-  <script type="module"
-   https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module
+
+  <!-- ESP Web Tools Install Button laden -->
+  https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module
   </script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+           line-height: 1.4; margin: 24px; }
+    h1 { margin-top: 0; }
+    .hint { color: #555; }
+    esp-web-install-button { display: block; margin: 16px 0; }
+    .ok { color: #2e7d32; }
+  </style>
 </head>
 <body>
   <h1>SaltMonitor Web Flash</h1>
-  <p>Verbinde deinen ESP32 und klicke auf den Button:</p>
+
+  <!-- Kleiner Debug-Hinweis, damit klar ist, dass die Seite geladen wurde -->
+  <p class="hint" id="status"><strong class="ok">Seite geladen.</strong> Verbinde deinen ESP32 per USB
+    und klicke auf den Button unten. Nutze Chrome oder Edge.</p>
+
+  <!-- Install-Button mit Manifest -->
   <esp-web-install-button manifest="./manifest.json">
-    Firmware installieren
+    <!-- Der sichtbare Button (Slot "activate") -->
+    <button slot="activate">Firmware installieren</button>
+
+    <!-- Fallback-Texte, wenn Browser nicht unterstützt / Seite nicht über HTTPS -->
+    <span slot="unsupported">
+      Dein Browser unterstützt Web Serial nicht. Bitte Chrome oder Edge verwenden.
+    </span>
+    <span slot="not-allowed">
+      Diese Seite muss über <strong>HTTPS</strong> (GitHub Pages) oder <strong>localhost</strong> geladen werden.
+    </span>
   </esp-web-install-button>
+
+  <noscript>Bitte JavaScript aktivieren.</noscript>
 </body>
 </html>
