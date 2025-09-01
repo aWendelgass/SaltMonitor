@@ -1,12 +1,13 @@
-# Dieses Projekt verwende ich mit einem AQMOS R2D2 32 Wasserenthärter.
-# Das ganze Gerät steht auf einer speziellen 3D Gedruckten Waage. Dies ist über ein gewöhnliches Netzwerkkabel  mit einer Controlbox verbunden. Darin sitzt ein ESP 32.
-# Momentan werden alle Daten an einen MQTT Server (in IOBROKER) übertragen. Momentan ist das ganze ein Messprototyp. Ziel ist es das zu einem autarken System auszubauen, 
-# welches an das Handy bzw. an IOBROKER meldet, wenn Regeneriersalz nachgefüllt werden muss 
+# Protoyp Status 
+Dieses Projekt verwende ich mit einem AQMOS R2D2 32 Wasserenthärter.
+Das ganze Gerät steht auf einer speziellen 3D Gedruckten Waage. Dies ist über ein gewöhnliches Netzwerkkabel  mit einer Controlbox verbunden. Darin sitzt ein ESP 32.
+Momentan werden alle Daten an einen MQTT Server (in IOBROKER) übertragen. Momentan ist das ganze ein Messprototyp. Ziel ist es das zu einem autarken System auszubauen, 
+welches an das Handy bzw. an IOBROKER meldet, wenn Regeneriersalz nachgefüllt werden muss 
   
-# I am using this project with an AQMOS R2D2 32 water softener.
-# The whole device stands on a special 3D printed scale. This is connected to a control box via an ordinary network cable. Inside is an ESP 32.
-# All data is currently transmitted to an MQTT server (in IOBROKER). At the moment the whole thing is a measurement prototype. The aim is to develop it into a self-sufficient system,
-# which reports to the mobile phone or IOBROKER when regeneration salt needs to be topped up
+I am using this project with an AQMOS R2D2 32 water softener.
+The whole device stands on a special 3D printed scale. This is connected to a control box via an ordinary network cable. Inside is an ESP 32.
+All data is currently transmitted to an MQTT server (in IOBROKER). At the moment the whole thing is a measurement prototype. The aim is to develop it into a self-sufficient system,
+which reports to the mobile phone or IOBROKER when regeneration salt needs to be topped up
 
 # Salt Monitor for Water Softener
 
