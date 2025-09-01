@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="de">
 <head>
@@ -5,38 +6,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SaltMonitor Web Flash</title>
 
-  <!-- ESP Web Tools Install Button laden -->
-  https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module
-  </script>
-
   <style>
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
-           line-height: 1.4; margin: 24px; }
-    h1 { margin-top: 0; }
-    .hint { color: #555; }
-    esp-web-install-button { display: block; margin: 16px 0; }
+           margin: 24px; line-height: 1.4; }
     .ok { color: #2e7d32; }
+    .err { color: #b00020; }
+    esp-web-install-button { display: block; margin: 16px 0; }
   </style>
+
+  <!-- Lade ESP Web Tools per Inline-ESM-Import, keine src-Attribut-Falle mehr -->
+  <script type="module">
+    const statusEl = document.getElementById('modstatus') || (() => {
+      const p = document.createElement('p'); p.id = 'modstatus'; document.documentElement.prepend(p); return p;
+    })();
+    (async () => {
+      try {
+        await import('https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module');
+        statusEl.className = 'ok';
+        statusEl.textContent = 'Modul geladen – ESP Web Tools ist aktiv.';
+      } catch (e) {
+        statusEl.className = 'err';
+        statusEl.textContent = 'Fehler: ESP Web Tools konnte nicht geladen werden (CDN/Netzwerk geblockt?).';
+        console.error(e);
+      }
+    })();
+  </script>
 </head>
 <body>
   <h1>SaltMonitor Web Flash</h1>
+  <p>Verbinde deinen ESP32 per USB und klicke auf den Button.</p>
 
-  <!-- Kleiner Debug-Hinweis, damit klar ist, dass die Seite geladen wurde -->
-  <p class="hint" id="status"><strong class="ok">Seite geladen.</strong> Verbinde deinen ESP32 per USB
-    und klicke auf den Button unten. Nutze Chrome oder Edge.</p>
-
-  <!-- Install-Button mit Manifest -->
   <esp-web-install-button manifest="./manifest.json">
-    <!-- Der sichtbare Button (Slot "activate") -->
     <button slot="activate">Firmware installieren</button>
-
-    <!-- Fallback-Texte, wenn Browser nicht unterstützt / Seite nicht über HTTPS -->
-    <span slot="unsupported">
-      Dein Browser unterstützt Web Serial nicht. Bitte Chrome oder Edge verwenden.
-    </span>
-    <span slot="not-allowed">
-      Diese Seite muss über <strong>HTTPS</strong> (GitHub Pages) oder <strong>localhost</strong> geladen werden.
-    </span>
+    <span slot="unsupported">Dein Browser unterstützt Web Serial nicht. Bitte Chrome oder Edge verwenden.</span>
+    <span slot="not-allowed">Diese Seite muss über HTTPS oder localhost geladen werden.</span>
   </esp-web-install-button>
 
   <noscript>Bitte JavaScript aktivieren.</noscript>
