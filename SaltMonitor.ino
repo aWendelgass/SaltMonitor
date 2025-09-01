@@ -247,7 +247,42 @@ static void mqttPublishLoop(){
   // calibrated
   String tCal = base + F("/calibrated");
   configManager.publish(tCal.c_str(), meineWaage.istKalibriert()?"1":"0", true, 0);
+
+  // rssi
+  String tRssi = base + F("/rssi");
+  configManager.publish(tRssi.c_str(), String(configManager.getRSSI()), true, 0);
 }
+
+// ------------------------------
+// Status LED
+// ------------------------------
+static void handleLedStatus() {
+  static unsigned long previousMillis = 0;
+  static bool ledState = LOW;
+  const long interval = 500; // Blink interval 500ms -> 1Hz
+
+  // Do not interfere with calibration blinking, which is a blocking process
+  if (uiPage == UiPage::CALIBRATION) {
+    // The Waage class handles its own blinking with delay()
+    return;
+  }
+
+  if (configManager.isWifiConnected()) {
+    if (ledState == LOW) {
+      digitalWrite(LED_PIN, HIGH);
+      ledState = HIGH;
+    }
+  } else {
+    // Blink LED if not connected
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= interval) {
+      previousMillis = currentMillis;
+      ledState = !ledState;
+      digitalWrite(LED_PIN, ledState);
+    }
+  }
+}
+
 
 // ------------------------------
 // Setup & Loop
@@ -289,6 +324,7 @@ void loop(){
   configManager.handleLoop();
   meineWaage.loop();
   mqttPublishLoop();
+  handleLedStatus();
 
   static unsigned long lastOled=0; unsigned long now=millis();
   if(now-lastOled>=500){ updateOLED(); lastOled=now; }
