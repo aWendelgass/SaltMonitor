@@ -1,4 +1,4 @@
-constexpr const char* VERSION = "Version 2.40";
+constexpr const char* VERSION= "Version 2.40";
 
 //Geändert in 2.40: WifiConfigManager.CPP: Such nach bestem WLAN Hotspot
 
