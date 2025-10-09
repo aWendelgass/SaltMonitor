@@ -1,11 +1,12 @@
-constexpr const char* VERSION= "Version 2.40";
+constexpr const char* VERSION= "Version 2.50";
 
-//Geändert in 2.40: WifiConfigManager.CPP: Such nach bestem WLAN Hotspot
+//Geändert in 2.50: WifiConfigManager.CPP: Such nach bestem WLAN Hotspot
 
 // SaltMonitor.ino — U8g2_for_Adafruit_GFX, monospaced Ziffern
 // Kalibrierung in kg (ohne Heuristik), INFO: IP + MQTT-Status
 // MQTT: gewicht_kg (retained) mit Punkt als Dezimaltrenner
 // Anzeige: weiterhin Komma als Dezimaltrenner
+// 2.50: Einführung Regenerationszyklen
 
 #include <Arduino.h>
 #include "Waage.h"
@@ -44,8 +45,8 @@ uint8_t oledAddr             = 0x3C; // 0x3C/0x3D
 // ------------------------------
 // WifiConfigManager – Strukturen
 // ------------------------------
-#define ANZ_EXTRA_PARAMS   6
-#define ANZ_WEBFORM_ITEMS 13
+#define ANZ_EXTRA_PARAMS   8
+#define ANZ_WEBFORM_ITEMS 15
 ConfigStruc config = {
   "Salz Monitor", // title
   "",             // ssid
@@ -63,6 +64,8 @@ ConfigStruc config = {
 #define key_kalibriert            "calibrated"
 #define key_akkusticalarm         "alarm"
 #define key_fuellstand            "level"
+#define key_zyklen                "cycles"
+#define key_zyklus                "cycle"
 
 ExtraStruc extraParams[ANZ_EXTRA_PARAMS] = {
   { key_Kalibirierungsgewicht , FLOAT, "", 5.000, false, -1, false, true  }, // 5.000 kg Default
@@ -70,7 +73,9 @@ ExtraStruc extraParams[ANZ_EXTRA_PARAMS] = {
   { key_offset,                  LONG,  "", -1.0,  false,  0, false, false },
   { key_kalibriert,              BOOL,  "", -1.0,  false, -1, false, false },
   { key_akkusticalarm,           BOOL,  "", -1.0,  true,  -1, false, true  },
-  { key_fuellstand,              LONG,  "", -1.0,  false, 10, false, true  }
+  { key_fuellstand,              LONG,  "", -1.0,  false, 10, false, true  },
+  { key_zyklen,                  LONG,  "", -1.0,  false, 8, false, true   },  // Regneratioinszyklen bis leer
+  { key_zyklus,                  LONG,  "", -1.0,  false, 0, false, true  }   // Aktueller ZYklus nach füllung
 };
 
 const WebStruc webForm[ANZ_WEBFORM_ITEMS] = {
@@ -86,7 +91,9 @@ const WebStruc webForm[ANZ_WEBFORM_ITEMS] = {
   { BLANK,       "",                          "" },
   { PARAMETER,   "Akkustischer Alarm",        key_akkusticalarm         },
   { BLANK,       "",                          "" },
-  { PARAMETER,   "Initialer Salz-Füllstand",  key_fuellstand            }
+  { PARAMETER,   "Initialer Salz-Füllstand",  key_fuellstand            },
+  { PARAMETER,   "Regenerationszyklen",       key_zyklen                },
+  { PARAMETER,   "Aktuelle Regeneration",     key_zyklus                }
 };
 
 WifiConfigManager configManager(&config, extraParams, webForm, ANZ_WEBFORM_ITEMS, ANZ_EXTRA_PARAMS, VERSION);
